@@ -13,6 +13,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- 搜尋欄位，放置在地圖的頂部 -->
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:queryHint="Search for an address"
+        android:background="#80000000"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp" />
+
     <!-- Button 放置在地圖的底部，與地圖重疊 -->
     <Button
         android:id="@+id/finishButton"
