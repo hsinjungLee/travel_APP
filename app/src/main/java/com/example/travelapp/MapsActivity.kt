@@ -1,7 +1,9 @@
 package com.example.travelapp
 
+import android.content.Intent
 import android.location.Geocoder
 import android.os.Bundle
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -17,26 +19,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var searchView: SearchView
+    private var lastSearchedLocation: LatLng? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
-        // 初始化 SearchView
+
         searchView = findViewById(R.id.searchView)
 
-        // 設置地圖
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        // 設置 SearchView 的搜尋監聽器
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     showLocationOnMap(it)
                 }
-                searchView.clearFocus()  // 提交後隱藏鍵盤
+                searchView.clearFocus()
                 return true
             }
 
@@ -44,6 +47,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 return false
             }
         })
+
+
+        findViewById<Button>(R.id.finishButton).setOnClickListener {
+            val intent = Intent(this, SavedLocationsActivity::class.java)
+            startActivity(intent)
+        }
+
+
+        findViewById<Button>(R.id.SaveLocationButton).setOnClickListener {
+            lastSearchedLocation?.let {
+                saveLocation(it)
+                Toast.makeText(this, "Location saved!", Toast.LENGTH_SHORT).show()
+            } ?: Toast.makeText(this, "No location to save", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -57,11 +74,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             if (addressList!!.isNotEmpty()) {
                 val location = addressList[0]
                 val latLng = LatLng(location.latitude, location.longitude)
+                lastSearchedLocation = latLng  // Store the last searched location
 
-                // 清除地圖上的所有標記
+
                 mMap.clear()
 
-                // 在地圖上加入新標記
+
                 mMap.addMarker(MarkerOptions().position(latLng).title(address))
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
             } else {
@@ -71,6 +89,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             e.printStackTrace()
             Toast.makeText(this, "Error fetching location", Toast.LENGTH_SHORT).show()
         }
+    }
+
+
+    private fun saveLocation(location: LatLng) {
+        val sharedPreferences = getSharedPreferences("maps_pref", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        // 取得已儲存的地標清單
+        val savedLocations = sharedPreferences.getStringSet("saved_locations", mutableSetOf()) ?: mutableSetOf()
+        savedLocations.add("${location.latitude},${location.longitude}")
+
+        editor.putStringSet("saved_locations", savedLocations)
+        editor.apply()
     }
 }
 
