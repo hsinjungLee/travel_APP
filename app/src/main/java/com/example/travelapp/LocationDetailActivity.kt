@@ -1,11 +1,11 @@
 package com.example.travelapp
 
-import android.location.Geocoder
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
+import android.widget.TimePicker
 import androidx.appcompat.app.AppCompatActivity
-import java.util.Locale
 
 class LocationDetailActivity : AppCompatActivity() {
 
@@ -13,38 +13,28 @@ class LocationDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_location_detail)
 
-        // 從 Intent 獲取經緯度資料（假設格式為 "latitude,longitude"）
         val locationCoordinates = intent.getStringExtra("location_coordinates") ?: "Unknown"
+        val locationName = intent.getStringExtra("location_name") ?: "Location Name"
+
         val locationTextView: TextView = findViewById(R.id.locationNameTextView)
 
-        if (locationCoordinates != "Unknown") {
-            val parts = locationCoordinates.split(",")
-            if (parts.size == 2) {
-                val latitude = parts[0].toDoubleOrNull()
-                val longitude = parts[1].toDoubleOrNull()
+        locationTextView.text = locationName
 
-                if (latitude != null && longitude != null) {
-                    val readableName = getReadableLocationName(latitude, longitude)
-                    locationTextView.text = readableName
-                } else {
-                    locationTextView.text = "Invalid Coordinates"
-                }
-            } else {
-                locationTextView.text = "Invalid Format"
-            }
-        } else {
-            locationTextView.text = "No Coordinates Provided"
-        }
-    }
+        val timePicker: TimePicker = findViewById(R.id.timePicker)
+        val saveButton: Button = findViewById(R.id.saveButton)
 
-    private fun getReadableLocationName(latitude: Double, longitude: Double): String {
-        return try {
-            val geocoder = Geocoder(this, Locale.getDefault())
-            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-            addresses?.firstOrNull()?.getAddressLine(0) ?: "Unknown Location"
-        } catch (e: Exception) {
-            Toast.makeText(this, "Failed to fetch location name", Toast.LENGTH_SHORT).show()
-            "Unknown Location"
+        saveButton.setOnClickListener {
+            val hour = timePicker.hour
+            val minute = timePicker.minute
+            val time = String.format("%02d:%02d", hour, minute)
+
+            val sharedPreferences = getSharedPreferences("maps_pref", MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.putString("saved_time_for_${locationCoordinates}", time)
+            editor.apply()
+
+            val intent = Intent(this, SavedLocationsActivity::class.java)
+            startActivity(intent)
         }
     }
 }

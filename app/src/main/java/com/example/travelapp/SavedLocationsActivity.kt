@@ -3,11 +3,10 @@ package com.example.travelapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.SimpleAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.maps.model.LatLng
 import android.location.Geocoder
 import java.util.Locale
 
@@ -24,18 +23,33 @@ class SavedLocationsActivity : AppCompatActivity() {
 
         savedLocations = loadSavedLocations()
 
-        // 使用地點名稱顯示
-        val locationNames = savedLocations.map { getReadableLocationName(it) }
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, locationNames)
+        val data = savedLocations.map {
+            val locationName = getReadableLocationName(it)
+            val time = getSavedTimeForLocation(it)
+            mapOf("locationName" to locationName, "time" to time)
+        }
+
+
+        val adapter = SimpleAdapter(
+            this,
+            data,
+            android.R.layout.simple_list_item_2,
+            arrayOf("locationName", "time"),
+            intArrayOf(android.R.id.text1, android.R.id.text2)
+        )
+
         listView.adapter = adapter
+
 
         listView.setOnItemClickListener { _, _, position, _ ->
             val selectedLocation = savedLocations[position]
-            Toast.makeText(this, "Selected: ${locationNames[position]}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Selected: ${data[position]["locationName"]}", Toast.LENGTH_SHORT).show()
+
 
             val intent = Intent(this, LocationDetailActivity::class.java)
             intent.putExtra("location_coordinates", selectedLocation)
+            intent.putExtra("location_name", data[position]["locationName"])
             startActivity(intent)
         }
     }
@@ -43,12 +57,11 @@ class SavedLocationsActivity : AppCompatActivity() {
     private fun loadSavedLocations(): MutableList<String> {
         val sharedPreferences = getSharedPreferences("maps_pref", MODE_PRIVATE)
         val savedLocationsSet = sharedPreferences.getStringSet("saved_locations", mutableSetOf()) ?: mutableSetOf()
-
         return savedLocationsSet.toMutableList()
     }
 
     private fun getReadableLocationName(location: String): String {
-        val parts = location.split(",") // 假設格式為 "lat,lng"
+        val parts = location.split(",")
         return if (parts.size == 2) {
             try {
                 val lat = parts[0].toDouble()
@@ -63,7 +76,9 @@ class SavedLocationsActivity : AppCompatActivity() {
             "Unknown Location"
         }
     }
+
+    private fun getSavedTimeForLocation(location: String): String {
+        val sharedPreferences = getSharedPreferences("maps_pref", MODE_PRIVATE)
+        return sharedPreferences.getString("saved_time_for_$location", "No Time Set") ?: "No Time Set"
+    }
 }
-
-
-
