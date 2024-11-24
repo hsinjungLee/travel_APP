@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.location.Geocoder
 import android.widget.Button
 import java.util.Locale
-import android.os.AsyncTask
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL

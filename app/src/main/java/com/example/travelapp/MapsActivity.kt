@@ -118,6 +118,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val savedLocations = sharedPreferences.getStringSet("saved_locations", mutableSetOf()) ?: mutableSetOf()
         savedLocations.add("${location.latitude},${location.longitude}")
 
+
         editor.putStringSet("saved_locations", savedLocations)
         editor.apply()
     }

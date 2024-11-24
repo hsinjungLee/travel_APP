@@ -50,6 +50,7 @@
         android:layout_below="@id/deleteButton"
         android:layout_marginTop="16dp"
         android:backgroundTint="#00ACC1"
+
         android:text="Back" />
 
 
