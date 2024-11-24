@@ -15,7 +15,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-
 class SavedLocationsActivity : AppCompatActivity() {
 
     private lateinit var listView: ListView

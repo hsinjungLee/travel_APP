@@ -32,7 +32,6 @@ class LocationDetailActivity : AppCompatActivity() {
             val minute = timePicker.minute
             val time = String.format("%02d:%02d", hour, minute)
 
-
             val sharedPreferences = getSharedPreferences("maps_pref", MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             editor.putString("saved_time_for_${locationCoordinates}", time)

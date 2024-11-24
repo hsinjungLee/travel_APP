@@ -25,7 +25,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
-
         searchView = findViewById(R.id.searchView)
 
 
