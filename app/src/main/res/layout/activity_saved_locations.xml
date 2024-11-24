@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         tools:context=".SavedLocationsActivity">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -15,7 +15,18 @@
         <ListView
             android:id="@+id/savedLocationsList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="692dp" />
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginBottom="16dp"
+            android:text="Back to Map"
+            android:backgroundTint="#00ACC1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

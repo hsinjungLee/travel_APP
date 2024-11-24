@@ -28,19 +28,29 @@
 
     <Button
         android:id="@+id/saveButton"
-        android:layout_width="188dp"
-        android:layout_height="wrap_content"
+        android:layout_width="380dp"
+        android:layout_height="37dp"
         android:layout_marginTop="16dp"
+        android:backgroundTint="#00ACC1"
         android:text="Save" />
 
     <Button
         android:id="@+id/deleteButton"
-        android:layout_width="189dp"
-        android:layout_height="wrap_content"
+        android:layout_width="380dp"
+        android:layout_height="37dp"
         android:layout_below="@id/saveButton"
         android:layout_marginTop="16dp"
+        android:backgroundTint="#00ACC1"
         android:text="Delete" />
 
+    <Button
+        android:id="@+id/backListButton"
+        android:layout_width="380dp"
+        android:layout_height="37dp"
+        android:layout_below="@id/deleteButton"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#00ACC1"
+        android:text="Back" />
 
 
 </LinearLayout>

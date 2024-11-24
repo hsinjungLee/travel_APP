@@ -65,6 +65,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        val locationName = intent.getStringExtra("location_name")
+        if (!locationName.isNullOrEmpty()) {
+            val geocoder = Geocoder(this, Locale.getDefault())
+            try {
+                val addresses = geocoder.getFromLocationName(locationName, 1)
+                if (addresses!!.isNotEmpty()) {
+                    val location = addresses[0]
+                    val latLng = LatLng(location.latitude, location.longitude)
+
+                    mMap.addMarker(MarkerOptions().position(latLng).title(locationName))
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                } else {
+                    Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this, "Error finding location", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun showLocationOnMap(address: String) {
@@ -96,7 +114,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val sharedPreferences = getSharedPreferences("maps_pref", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
-        // 取得已儲存的地標清單
+
         val savedLocations = sharedPreferences.getStringSet("saved_locations", mutableSetOf()) ?: mutableSetOf()
         savedLocations.add("${location.latitude},${location.longitude}")
 

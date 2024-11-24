@@ -14,7 +14,7 @@ class LocationDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_location_detail)
 
-        // 获取传递的地点坐标和名称
+
         val locationCoordinates = intent.getStringExtra("location_coordinates") ?: "Unknown"
         val locationName = intent.getStringExtra("location_name") ?: "Location Name"
 
@@ -24,6 +24,7 @@ class LocationDetailActivity : AppCompatActivity() {
         val timePicker: TimePicker = findViewById(R.id.timePicker)
         val saveButton: Button = findViewById(R.id.saveButton)
         val deleteButton: Button = findViewById(R.id.deleteButton)
+        val backListButton :Button = findViewById(R.id.backListButton)
 
 
         saveButton.setOnClickListener {
@@ -60,5 +61,10 @@ class LocationDetailActivity : AppCompatActivity() {
             val intent = Intent(this, SavedLocationsActivity::class.java)
             startActivity(intent)
         }
+        backListButton.setOnClickListener {
+            val intent = Intent(this,SavedLocationsActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 }

@@ -31,7 +31,9 @@
         android:text="Finish"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:backgroundTint="#00ACC1"
         android:layout_marginBottom="16dp"/>
+
 
     <Button
         android:id="@+id/SaveLocationButton"
@@ -40,5 +42,6 @@
         android:text="Save"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:backgroundTint="#00ACC1"
         android:layout_marginBottom="64dp"/>
 </RelativeLayout>
