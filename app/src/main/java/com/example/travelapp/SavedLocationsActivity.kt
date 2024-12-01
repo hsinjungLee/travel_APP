@@ -25,7 +25,6 @@ class SavedLocationsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_saved_locations)
 
         listView = findViewById(R.id.savedLocationsList)
-
         savedLocations = loadSavedLocations()
 
 
@@ -63,7 +62,21 @@ class SavedLocationsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val showRoutesButton: Button = findViewById(R.id.showRoutesButton)
+
+        showRoutesButton.setOnClickListener {
+            if (savedLocations.size < 2) {
+                Toast.makeText(this, "Not enough locations to show routes", Toast.LENGTH_SHORT).show()
+            } else {
+                val intent = Intent(this, ShowRouteActivity::class.java)
+                intent.putStringArrayListExtra("saved_locations", ArrayList(savedLocations))
+                startActivity(intent)
+            }
+        }
+
     }
+
+
 
 
     private fun loadSavedLocations(): MutableList<String> {
@@ -94,8 +107,8 @@ class SavedLocationsActivity : AppCompatActivity() {
 
     private fun getSavedTimeForLocation(location: String): String {
         val sharedPreferences = getSharedPreferences("maps_pref", MODE_PRIVATE)
-        return sharedPreferences.getString("saved_time_for_$location", "99:99")
-            ?: "99:99"
+        return sharedPreferences.getString("saved_time_for_$location", "00:00")
+            ?: "24:59"
     }
 
 

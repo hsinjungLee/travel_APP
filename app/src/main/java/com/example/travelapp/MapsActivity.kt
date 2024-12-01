@@ -121,5 +121,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         editor.putStringSet("saved_locations", savedLocations)
         editor.apply()
     }
+
+
+
 }
 

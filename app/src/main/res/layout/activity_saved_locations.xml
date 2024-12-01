@@ -15,7 +15,7 @@
         <ListView
             android:id="@+id/savedLocationsList"
             android:layout_width="match_parent"
-            android:layout_height="692dp" />
+            android:layout_height="623dp" />
 
         <Button
             android:id="@+id/backButton"
@@ -27,6 +27,18 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/showRoutesButton"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginBottom="16dp"
+            android:text="Show Routes"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:backgroundTint="#00ACC1"/>
+
     </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
