@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
 import com.android.volley.Request
 import androidx.recyclerview.widget.RecyclerView
+import org.json.JSONException
 import kotlin.collections.*
 
 class ShowRouteActivity : AppCompatActivity() {
@@ -19,34 +20,42 @@ class ShowRouteActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_show_route)
+
+        val savedLocations = intent.getStringArrayListExtra("saved_locations") ?: arrayListOf()
+        if (savedLocations.size < 2) {
+            Toast.makeText(this, "Not enough locations to display routes", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val locations = savedLocations.map {
+            val parts = it.split(",")
+            LatLng(parts[0].toDouble(), parts[1].toDouble())
+        }
+
         val recyclerView: RecyclerView = findViewById(R.id.routeRecyclerView)
-
-
-        val origin = LatLng(40.748817, -73.985428)  // Example origin
-        val destination = LatLng(40.730610, -73.935242)  // Example destination
-
-        // 呼叫 DirectionsApiRequest 函數來獲取交通資訊
-        DirectionsApiRequest(
-            origin,
-            destination,
-            { route ->
-                // 更新UI顯示交通時間資訊
-                updateUIWithRouteInfo(route)
-            },
-            { error ->
-                Log.e("Directions", error)
-                Toast.makeText(this, "Failed to get directions", Toast.LENGTH_SHORT).show()
-            }
-        )
-
-
-        val routeAdapter = RouteAdapter(listOf())
+        val routeAdapter = RouteAdapter(mutableListOf())
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = routeAdapter
 
+        for (i in 0 until locations.size - 1) {
+            val origin = locations[i]
+            val destination = locations[i + 1]
+            DirectionsApiRequest(
+                origin,
+                destination,
+                { route ->
+                    routeAdapter.addRoute(route)
+                },
+                { error ->
+                    Log.e("Directions", error)
+                    Toast.makeText(this, "Failed to get directions for route $origin -> $destination", Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
     }
 
-    // DirectionsApiRequest 函數，發送 API 請求
+
+
     private fun DirectionsApiRequest(
         origin: LatLng,
         destination: LatLng,
@@ -83,49 +92,44 @@ class ShowRouteActivity : AppCompatActivity() {
         Volley.newRequestQueue(this).add(request)
     }
 
-    fun parseDirectionsResponse(response: JSONObject): Map<String, String> {
+    private fun parseDirectionsResponse(response: JSONObject): Map<String, String> {
         val result = mutableMapOf<String, String>()
 
-        // 解析 API 回應中的路徑信息
-        val routes = response.getJSONArray("routes")
-        val route = routes.getJSONObject(0)
-        val legs = route.getJSONArray("legs")
-        val leg = legs.getJSONObject(0)
+        try {
+            val routes = response.getJSONArray("routes")
+            if (routes.length() == 0) {
+                throw JSONException("No routes found")
+            }
 
-        // 獲取行駛時間等信息
-        val durationWalking = leg.getJSONObject("duration")?.getString("text") ?: "N/A"
-        val durationDriving = leg.getJSONObject("duration_in_traffic")?.getString("text")
-            ?: leg.getJSONObject("duration")?.getString("text") ?: "N/A"
+            val route = routes.getJSONObject(0)
+            val legs = route.getJSONArray("legs")
+            if (legs.length() == 0) {
+                throw JSONException("No legs found")
+            }
 
-        val stepsArray = leg.getJSONArray("steps")
-        val stepList = mutableListOf<String>()
-        for (i in 0 until stepsArray.length()) {
-            stepList.add(stepsArray.getJSONObject(i).toString())
+            val leg = legs.getJSONObject(0)
+            result["walking"] = leg.getJSONObject("duration")?.getString("text") ?: "N/A"
+            result["driving"] = leg.getJSONObject("duration_in_traffic")?.getString("text")
+                ?: leg.getJSONObject("duration")?.getString("text") ?: "N/A"
+            result["transit"] = "Transit unavailable"
+
+        } catch (e: JSONException) {
+            throw JSONException("Error parsing response: ${e.message}")
         }
-
-        val durationTransit = stepList.joinToString { it }
-
-
-        // 將各種時間添加到 Map 中
-        result["walking"] = durationWalking
-        result["driving"] = durationDriving
-        result["transit"] = durationTransit
 
         return result
     }
 
 
 
-    private fun updateUIWithRouteInfo(route: Route) {
-        // 假設這裡更新顯示 UI
-        val walkingTimeTextView: TextView = findViewById(R.id.walkingTimeTextView)
-        val drivingTimeTextView: TextView = findViewById(R.id.drivingTimeTextView)
-        val transitTimeTextView: TextView = findViewById(R.id.transitTimeTextView)
 
-        // 確保使用正確的屬性名稱
-        walkingTimeTextView.text = "Walking time: ${route.transportTimes["walking"]}"
-        drivingTimeTextView.text = "Driving time: ${route.transportTimes["driving"]}"
-        transitTimeTextView.text = "Transit time: ${route.transportTimes["transit"]}"
+    /*private fun updateUIWithRouteInfo(route: Route) {
+        val recyclerView: RecyclerView = findViewById(R.id.routeRecyclerView)
+        val routeAdapter = RouteAdapter(listOf(route))
+        recyclerView.adapter = routeAdapter
     }
+
+
+     */
 
 }

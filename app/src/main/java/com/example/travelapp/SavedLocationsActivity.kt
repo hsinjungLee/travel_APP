@@ -74,6 +74,7 @@ class SavedLocationsActivity : AppCompatActivity() {
             }
         }
 
+
     }
 
 
