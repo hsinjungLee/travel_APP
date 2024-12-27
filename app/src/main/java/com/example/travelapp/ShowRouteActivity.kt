@@ -62,74 +62,68 @@ class ShowRouteActivity : AppCompatActivity() {
         onComplete: (Route) -> Unit,
         onError: (String) -> Unit
     ) {
-        val url = "https://maps.googleapis.com/maps/api/directions/json?" +
-                "origin=${origin.latitude},${origin.longitude}" +
-                "&destination=${destination.latitude},${destination.longitude}" +
-                "&mode=driving" +
-                "&departure_time=now" +
-                "&traffic_model=best_guess" +
-                "&key=AIzaSyD3xV0G2iyvAnkc02FlTH92q11xx9GcjPQ"
 
+        val modes = listOf("driving", "walking", "bicycling", "motorcycle")
+        val times = mutableMapOf<String, String>()
 
-        val request = JsonObjectRequest(
-            Request.Method.GET,
-            url,
-            null,
-            { response ->
-                try {
-                    val times = parseDirectionsResponse(response)
-                    val route = Route(origin, destination,times)
-                    onComplete(route)
-                } catch (e: Exception) {
-                    onError("Error parsing response: ${e.message}")
+        var requestsCompleted = 0
+
+        modes.forEach { mode ->
+            val url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                    "origin=${origin.latitude},${origin.longitude}" +
+                    "&destination=${destination.latitude},${destination.longitude}" +
+                    "&mode=$mode" +
+                    "&key=AIzaSyD3xV0G2iyvAnkc02FlTH92q11xx9GcjPQ"
+
+            Log.d("RequestURL", url)
+
+            val request = JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                { response ->
+                    try {
+                        val modeTime = parseDurationFromResponse(response)
+                        times[mode] = modeTime
+                    } catch (e: Exception) {
+                        times[mode] = "N/A"
+                    }
+
+                    requestsCompleted++
+                    if (requestsCompleted == modes.size) {
+                        val route = Route(origin, destination, times)
+                        onComplete(route)
+                    }
+                },
+                { error ->
+                    times[mode] = "N/A"
+                    requestsCompleted++
+                    if (requestsCompleted == modes.size) {
+                        val route = Route(origin, destination, times)
+                        onComplete(route)
+                    }
                 }
-            },
-            { error ->
-                onError("Request failed: ${error.message}")
-            }
-        )
-
-        Volley.newRequestQueue(this).add(request)
+            )
+            Volley.newRequestQueue(this).add(request)
+        }
     }
 
-    private fun parseDirectionsResponse(response: JSONObject): Map<String, String> {
-        val result = mutableMapOf<String, String>()
-
-        try {
-            val routes = response.getJSONArray("routes")
-            if (routes.length() == 0) {
-                throw JSONException("No routes found")
-            }
+    private fun parseDurationFromResponse(response: JSONObject): String {
+        return try {
+            val routes = response.optJSONArray("routes")
+            if (routes == null || routes.length() == 0) return "No routes available"
 
             val route = routes.getJSONObject(0)
-            val legs = route.getJSONArray("legs")
-            if (legs.length() == 0) {
-                throw JSONException("No legs found")
-            }
+            val legs = route.optJSONArray("legs")
+            if (legs == null || legs.length() == 0) return "No legs available"
 
             val leg = legs.getJSONObject(0)
-            result["walking"] = leg.getJSONObject("duration")?.getString("text") ?: "N/A"
-            result["driving"] = leg.getJSONObject("duration_in_traffic")?.getString("text")
-                ?: leg.getJSONObject("duration")?.getString("text") ?: "N/A"
-            result["transit"] = "Transit unavailable"
-
+            val duration = leg.optJSONObject("duration")
+            duration?.getString("text") ?: "Duration not found"
         } catch (e: JSONException) {
-            throw JSONException("Error parsing response: ${e.message}")
+            Log.e("ParseError", "Error parsing JSON: ${e.message}")
+            "Parsing error"
         }
-
-        return result
     }
-
-
-
-
-    /*private fun updateUIWithRouteInfo(route: Route) {
-        val recyclerView: RecyclerView = findViewById(R.id.routeRecyclerView)
-        val routeAdapter = RouteAdapter(listOf(route))
-        recyclerView.adapter = routeAdapter
-    }
-
-
-     */
 
 }

@@ -10,9 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.location.Geocoder
 import android.widget.Button
 import java.util.Locale
-import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
+
 
 
 class SavedLocationsActivity : AppCompatActivity() {
@@ -77,9 +75,6 @@ class SavedLocationsActivity : AppCompatActivity() {
 
     }
 
-
-
-
     private fun loadSavedLocations(): MutableList<String> {
         val sharedPreferences = getSharedPreferences("maps_pref", MODE_PRIVATE)
         val savedLocationsSet =
@@ -109,8 +104,9 @@ class SavedLocationsActivity : AppCompatActivity() {
     private fun getSavedTimeForLocation(location: String): String {
         val sharedPreferences = getSharedPreferences("maps_pref", MODE_PRIVATE)
         return sharedPreferences.getString("saved_time_for_$location", "00:00")
-            ?: "24:59"
+            ?: "00:00"
     }
+
 
 
 }

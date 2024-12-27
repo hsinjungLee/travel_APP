@@ -2,6 +2,7 @@ package com.example.travelapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.TimePicker
@@ -37,6 +38,7 @@ class LocationDetailActivity : AppCompatActivity() {
             editor.putString("saved_time_for_${locationCoordinates}", time)
             editor.apply()
 
+            Log.d("SaveTime", "Saved time for $locationCoordinates: $time")
 
             val intent = Intent(this, SavedLocationsActivity::class.java)
             startActivity(intent)

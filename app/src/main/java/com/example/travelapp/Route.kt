@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.model.LatLng
 
 
-data class Route(
+data class  Route(
     val from: LatLng,
     val to: LatLng,
     val transportTimes: Map<String, String>
